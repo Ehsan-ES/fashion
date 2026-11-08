@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mariadb:11.4
+    ports: ["3308:3306"]
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-boutique}
+      MARIADB_USER: ${DB_USER:-boutique}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-boutique_pass}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_pass}
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes: [db_data:/var/lib/mysql]
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6380:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    image: boutique-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: ./backend/.env
+    volumes: ["./backend:/app"]
+    ports: ["8500:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+
+  celery:
+    build: ./backend
+    image: boutique-backend
+    command: celery -A config worker -l info
+    env_file: ./backend/.env
+    volumes: ["./backend:/app"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+
+  frontend:
+    build: ./frontend
+    command: npm run dev -- --host 0.0.0.0
+    env_file: ./frontend/.env
+    volumes: ["./frontend:/app", "/app/node_modules"]
+    ports: ["5175:5173"]
+    depends_on: [backend]
+
+volumes:
+  db_data:

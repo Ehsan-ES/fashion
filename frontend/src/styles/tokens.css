@@ -1,0 +1,22 @@
+:root {
+  --ink: #111111;
+  --paper: #f8f6f2;
+  --stone: #e8e5df;
+  --sand: #d8c9b5;
+  --gold: #b69b70;
+  --gold-text: #8a7147; /* طلایی تیره‌تر برای متن روی زمینه روشن */
+
+  --font-fa: "Vazirmatn", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Vazirmatn", serif;
+
+  --fs-display: clamp(2.5rem, 6vw + 1rem, 6rem);
+  --fs-h2: clamp(1.75rem, 3vw + 0.5rem, 3rem);
+  --fs-body: clamp(0.95rem, 0.3vw + 0.9rem, 1.05rem);
+
+  --space-1: 4px; --space-2: 8px; --space-3: 16px; --space-4: 24px;
+  --space-5: 32px; --space-6: 48px; --space-7: 64px; --space-8: 96px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 400ms;
+  --dur-slow: 900ms;
+}

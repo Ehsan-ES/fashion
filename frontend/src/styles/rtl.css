@@ -1,0 +1,2 @@
+/* از Logical Properties استفاده کنید: margin-inline-start, padding-inline-end, inset-inline-start, ... */
+[dir="rtl"] .flip-x { transform: scaleX(-1); }
