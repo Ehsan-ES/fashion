@@ -4,7 +4,7 @@
   --stone: #e8e5df;
   --sand: #d8c9b5;
   --gold: #b69b70;
-  --gold-text: #8a7147; /* طلایی تیره‌تر برای متن روی زمینه روشن */
+  --gold-text: #8a7147; /* طلایی تیره‌تر برای متن روی زمینه روشن (Contrast ≥ 4.5) */
 
   --font-fa: "Vazirmatn", system-ui, sans-serif;
   --font-display: "Cormorant Garamond", "Vazirmatn", serif;
@@ -15,6 +15,14 @@
 
   --space-1: 4px; --space-2: 8px; --space-3: 16px; --space-4: 24px;
   --space-5: 32px; --space-6: 48px; --space-7: 64px; --space-8: 96px;
+
+  --container: 1440px;
+  --gutter: clamp(16px, 4vw, 56px);
+  --header-h: 88px;          /* ارتفاع هدر در بالای صفحه */
+  --header-h-compact: 64px;  /* ارتفاع هدر بعد از اسکرول */
+
+  --z-header: 100;
+  --z-overlay: 300;
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --dur-fast: 400ms;

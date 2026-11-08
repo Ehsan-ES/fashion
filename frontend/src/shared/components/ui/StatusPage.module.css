@@ -1,0 +1,5 @@
+.page { min-height: 60vh; display: grid; place-content: center; justify-items: center; gap: var(--space-3); text-align: center; padding: var(--space-7) var(--gutter); }
+.title { font-size: var(--fs-h2); }
+.text { max-width: 46ch; opacity: 0.8; }
+.link { margin-block-start: var(--space-3); padding: var(--space-3) var(--space-5); border: 1px solid var(--ink); transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease); }
+.link:hover { background: var(--ink); color: var(--paper); }

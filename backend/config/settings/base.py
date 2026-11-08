@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework_simplejwt.token_blacklist",
     "apps.accounts",
+    "apps.catalog",
+    "apps.inventory",
     "core",
 ]
 
@@ -124,6 +126,8 @@ SPECTACULAR_SETTINGS = {
 
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[])
 CORS_ALLOW_CREDENTIALS = True
+
+CATALOG_NEW_DAYS = 30
 
 OTP_MOCK_ENABLED = env.bool("OTP_MOCK_ENABLED", default=False)
 OTP_LENGTH = 6
