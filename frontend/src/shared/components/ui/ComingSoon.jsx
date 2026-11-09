@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "../../router";
 import styles from "./StatusPage.module.css";
 
 /** مسیرهایی که در مراحل بعدی ساخته می‌شوند؛ آدرس‌ها از همین حالا ثابت‌اند. */

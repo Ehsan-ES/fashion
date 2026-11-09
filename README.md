@@ -27,3 +27,27 @@ docker compose exec backend pytest
 ```
 - API: `/api/products/` · `/api/products/filters/` · `/api/categories/` · `/api/brands/` · `/api/collections/`
 - ادمین: `/admin/` ← محصولات (تصاویر، Variantها و موجودی در همان صفحه محصول)
+
+## مرحله ۴: Layout فرانت
+```bash
+docker compose up -d --build --renew-anon-volumes frontend   # وابستگی‌های جدید: framer-motion, gsap, lenis
+docker compose exec backend python manage.py seed_catalog     # تصویر دسته‌ها/کالکشن‌ها برای Mega Menu
+docker compose exec frontend npm test
+```
+
+## مرحله ۴b: Vike (Routing)
+```bash
+docker compose exec frontend npm install vike vike-react     # قبل از استخراج فایل‌های جدید
+# فایل‌ها را استخراج کنید، سپس:
+docker compose restart frontend
+docker compose exec frontend npm uninstall react-router-dom
+docker compose exec frontend npm test
+```
+فایل‌های حذفی: `frontend/index.html`، `src/main.jsx`، `src/app/App.jsx`، `src/app/App.test.jsx`، `src/features/home/HomePlaceholder.jsx`
+
+## مرحله ۵: صفحه اصلی
+```bash
+docker compose exec frontend npm install three @react-three/fiber
+docker compose restart frontend
+docker compose exec frontend npm test
+```

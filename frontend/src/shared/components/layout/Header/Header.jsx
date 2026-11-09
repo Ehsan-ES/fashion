@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "../../../router";
 import { useAuthStore } from "../../../../features/auth/useAuthStore";
 import { useCartStore } from "../../../../features/cart/useCartStore";
 import { useCategories, useFeaturedCollections } from "../../../../features/catalog/api";

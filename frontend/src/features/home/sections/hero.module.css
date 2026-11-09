@@ -1,0 +1,53 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  color: var(--paper);
+  background:
+    radial-gradient(ellipse at 75% 25%, rgba(182, 155, 112, 0.28), transparent 55%),
+    radial-gradient(ellipse at 20% 85%, rgba(216, 201, 181, 0.12), transparent 50%),
+    linear-gradient(160deg, #1b1b1b, var(--ink));
+}
+.canvas { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.content {
+  position: relative;
+  z-index: 1;
+  max-width: var(--container);
+  width: 100%;
+  margin-inline: auto;
+  padding: calc(var(--header-h) + var(--space-6)) var(--gutter) var(--space-8);
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+.eyebrow { font-family: var(--font-display); letter-spacing: 0.5em; color: var(--sand); margin: 0; }
+.title { font-size: var(--fs-display); line-height: 1.15; max-width: 12ch; }
+.line { display: block; overflow: hidden; padding-block: 0.08em; }
+.lineInner { display: block; }
+.lead { max-width: 44ch; opacity: 0.85; margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-block-start: var(--space-3); }
+.btn {
+  display: inline-block;
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid var(--paper);
+  letter-spacing: 0.05em;
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.btn:hover, .btn:focus-visible { background: var(--paper); color: var(--ink); }
+.btnPrimary { background: var(--paper); color: var(--ink); }
+.btnPrimary:hover, .btnPrimary:focus-visible { background: var(--gold); border-color: var(--gold); }
+.cue {
+  position: absolute;
+  inset-inline-start: var(--gutter);
+  inset-block-end: var(--space-5);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+.cue::before { content: ""; width: 48px; height: 1px; background: currentColor; }

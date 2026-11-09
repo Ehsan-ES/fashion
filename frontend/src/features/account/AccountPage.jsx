@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "../../shared/router";
 import { updateMe } from "../auth/authService";
 import { useAuthStore } from "../auth/useAuthStore";
 import { getErrorMessage } from "../../shared/utils/errors";

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "../../shared/router";
 import { CloseIcon } from "../../shared/components/layout/Header/icons";
 import { useDebouncedValue } from "../../shared/hooks/useDebouncedValue";
 import { useModal } from "../../shared/hooks/useModal";

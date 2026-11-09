@@ -1,8 +1,8 @@
-import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import vike from "vike/plugin";
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [vike(), react()],
   server: { port: 5173, watch: { usePolling: true } },
-  test: { environment: "jsdom", globals: true, setupFiles: "./src/setupTests.js" },
 });

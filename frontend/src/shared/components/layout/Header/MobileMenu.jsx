@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "../../../router";
 import { site } from "../../../config/site";
 import { useModal } from "../../../hooks/useModal";
 import { formatNumber } from "../../../utils/format";

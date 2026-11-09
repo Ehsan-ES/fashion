@@ -13,6 +13,11 @@ if (!window.ResizeObserver) {
 }
 window.scrollTo = window.scrollTo || (() => {});
 
+// Router (Vike) در تست‌ها شبیه‌سازی می‌شود؛ آدرس با setTestUrl از src/test/router.js تنظیم می‌شود
+globalThis.__pageContext = { urlPathname: "/", urlParsed: { searchOriginal: null }, routeParams: {}, is404: false };
+vi.mock("vike-react/usePageContext", () => ({ usePageContext: () => globalThis.__pageContext }));
+vi.mock("vike/client/router", () => ({ navigate: vi.fn() }));
+
 // انیمیشن‌ها در تست خاموش‌اند تا نتیجه قطعی باشد
 vi.mock("framer-motion", () => {
   const strip = ({ children, initial, animate, exit, transition, variants, custom, layout, whileHover, whileTap, ...rest }) => ({ rest, children });

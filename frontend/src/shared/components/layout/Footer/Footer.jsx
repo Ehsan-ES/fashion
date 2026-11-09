@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "../../../router";
 import { site } from "../../../config/site";
 import styles from "./Footer.module.css";
 

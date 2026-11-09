@@ -1,0 +1,85 @@
+.section { max-width: var(--container); margin-inline: auto; padding: var(--space-8) var(--gutter) 0; }
+.head { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--space-4); margin-block-end: var(--space-6); }
+.eyebrow { margin: 0 0 var(--space-2); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; color: var(--gold-text); }
+.title { font-size: var(--fs-h2); }
+.more { white-space: nowrap; border-block-end: 1px solid currentColor; padding-block-end: 2px; transition: color var(--dur-fast); }
+.more:hover { color: var(--gold-text); }
+
+/* ---------- گرید نامتقارن (تازه‌ها) ---------- */
+.asym { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5) var(--space-3); padding-block-end: var(--space-6); }
+.asym > :nth-child(even) { margin-block-start: 32px; }
+@media (min-width: 900px) {
+  .asym { grid-template-columns: repeat(12, 1fr); gap: var(--space-6) var(--space-4); align-items: start; padding-block-end: 80px; }
+  .asym > :nth-child(1) { grid-column: 1 / span 5; margin-block-start: 0; }
+  .asym > :nth-child(2) { grid-column: 6 / span 3; margin-block-start: 96px; }
+  .asym > :nth-child(3) { grid-column: 9 / span 4; margin-block-start: 32px; }
+  .asym > :nth-child(4) { grid-column: 1 / span 4; margin-block-start: 0; }
+  .asym > :nth-child(5) { grid-column: 5 / span 4; margin-block-start: 64px; }
+  .asym > :nth-child(6) { grid-column: 9 / span 4; margin-block-start: 16px; }
+}
+
+/* ---------- گرید ۴ ستونی با پله (منتخب‌ها، تخفیف‌ها) ---------- */
+.grid4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5) var(--space-3); padding-block-end: var(--space-6); }
+.grid4 > :nth-child(even) { margin-block-start: 32px; }
+@media (min-width: 900px) {
+  .grid4 { grid-template-columns: repeat(4, 1fr); gap: var(--space-5) var(--space-4); }
+  .grid4 > :nth-child(even) { margin-block-start: 48px; }
+}
+
+/* ---------- کالکشن‌ها ---------- */
+.collections { display: grid; gap: var(--space-5); }
+.collection { position: relative; display: block; overflow: hidden; background: var(--stone); aspect-ratio: 4 / 3; }
+.collection img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease); }
+.collection:hover img, .collection:focus-visible img { transform: scale(1.06); }
+.collectionBody {
+  position: absolute; inset-inline: 0; inset-block-end: 0;
+  padding: var(--space-5); color: var(--paper);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.65));
+}
+.collectionTitle { font-size: clamp(1.4rem, 2.5vw, 2.2rem); }
+.collectionText { margin: var(--space-2) 0 0; opacity: 0.85; max-width: 40ch; }
+.collectionCta { display: inline-block; margin-block-start: var(--space-3); border-block-end: 1px solid currentColor; }
+@media (min-width: 900px) {
+  .collections { grid-template-columns: 7fr 5fr; align-items: start; }
+  .collection:nth-child(2) { aspect-ratio: 4 / 5; margin-block-start: 80px; }
+  .collection:nth-child(3) { grid-column: 1 / -1; aspect-ratio: 21 / 9; }
+}
+
+/* ---------- دسته‌بندی‌ها ---------- */
+.cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+.cat { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: var(--stone); }
+.cat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform var(--dur-slow) var(--ease); }
+.cat:hover img, .cat:focus-visible img { transform: scale(1.07); }
+.cat span {
+  position: absolute; inset-inline: 0; inset-block-end: 0; padding: var(--space-4);
+  color: var(--paper); font-family: var(--font-display); font-size: 1.4rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+}
+@media (min-width: 700px) { .cats { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px) {
+  .cats { grid-template-columns: repeat(5, 1fr); }
+  .cats > :nth-child(even) { margin-block-start: 40px; }
+}
+
+/* ---------- ریل پرفروش‌ها ---------- */
+.railWrap { position: relative; }
+.rail {
+  display: flex; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-block-end: var(--space-4); scrollbar-width: thin;
+}
+.rail > * { flex: 0 0 min(70vw, 280px); scroll-snap-align: start; }
+.arrows { display: none; gap: var(--space-2); }
+.arrow {
+  width: 44px; height: 44px; display: grid; place-items: center; cursor: pointer;
+  background: none; border: 1px solid var(--ink);
+  transition: background-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+.arrow:hover { background: var(--ink); color: var(--paper); }
+@media (min-width: 900px) { .arrows { display: flex; } .rail > * { flex-basis: 300px; } }
+
+/* ---------- تخفیف‌ها (تیره) ---------- */
+.dark { background: var(--ink); color: var(--paper); margin-block-start: var(--space-8); padding-block-end: var(--space-8); }
+.dark .section { padding-block-start: var(--space-8); }
+.dark .eyebrow { color: var(--gold); }
+.dark .more:hover { color: var(--gold); }
+.bigPercent { font-family: var(--font-display); font-size: clamp(3rem, 9vw, 7rem); line-height: 1; color: var(--gold); margin: 0 0 var(--space-3); }

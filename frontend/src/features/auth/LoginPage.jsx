@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "../../shared/router";
 import { getErrorMessage, getRetryAfter } from "../../shared/utils/errors";
 import { requestOtp, verifyOtp } from "./authService";
 import { useAuthStore } from "./useAuthStore";
@@ -7,7 +7,7 @@ import styles from "./auth.module.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const params = useSearchParams();
   const status = useAuthStore((s) => s.status);
   const setSession = useAuthStore((s) => s.setSession);
 
@@ -25,7 +25,9 @@ export default function LoginPage() {
     return () => clearTimeout(t);
   }, [cooldown]);
 
-  const redirectTo = location.state?.from?.pathname || "/account";
+  // فقط مسیر داخلی پذیرفته می‌شود تا ریدایرکت به سایت دیگر ممکن نباشد
+  const next = params.get("next");
+  const redirectTo = next && next.startsWith("/") && !next.startsWith("//") ? next : "/account";
   if (status === "authenticated") return <Navigate to={redirectTo} replace />;
 
   const sendCode = async (e) => {

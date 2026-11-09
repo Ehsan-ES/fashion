@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link } from "../../../router";
 import styles from "./Header.module.css";
 
 const LABELS = { women: "زنانه", men: "مردانه" };

@@ -1,10 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
 import { beforeEach, expect, test, vi } from "vitest";
 import { useAuthStore } from "../../../../features/auth/useAuthStore";
 import { useCartStore } from "../../../../features/cart/useCartStore";
 import { searchProducts } from "../../../../features/catalog/api";
+import { setTestUrl } from "../../../../test/router";
 import { formatPrice } from "../../../utils/format";
 import Header from "./Header";
 
@@ -23,9 +23,7 @@ function renderHeader({ transparentOnTop = true } = {}) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={qc}>
-      <MemoryRouter initialEntries={["/"]}>
-        <Header transparentOnTop={transparentOnTop} />
-      </MemoryRouter>
+      <Header transparentOnTop={transparentOnTop} />
     </QueryClientProvider>
   );
 }
@@ -34,6 +32,7 @@ const setScroll = (y) => Object.defineProperty(window, "scrollY", { value: y, co
 
 beforeEach(() => {
   vi.clearAllMocks();
+  setTestUrl("/");
   setScroll(0);
   useAuthStore.setState({ user: null, status: "anonymous" });
   useCartStore.setState({ count: 0 });
