@@ -1,13 +1,10 @@
 import { Link } from "../../../shared/router";
 import { formatNumber, formatPrice } from "../../../shared/utils/format";
+import WishlistButton from "../../wishlist/WishlistButton";
 import styles from "./ProductCard.module.css";
 
 const MAX_DOTS = 4;
 
-/**
- * کارت محصول. دکمه‌های افزودن سریع به سبد، علاقه‌مندی و مشاهده سریع همراه Cart (مرحله ۸) و Wishlist (مرحله ۹)
- * اضافه می‌شوند تا هیچ دکمه بی‌عملکردی نمایش داده نشود.
- */
 export default function ProductCard({ product: p, variant = "default", priority = false }) {
   const onSale = p.discount_percent > 0;
   const colors = p.colors ?? [];
@@ -76,6 +73,7 @@ export default function ProductCard({ product: p, variant = "default", priority 
           )}
         </div>
       </Link>
+      <WishlistButton product={p} className={styles.wishlist} />
     </article>
   );
 }

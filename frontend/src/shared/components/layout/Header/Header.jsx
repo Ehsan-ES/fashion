@@ -3,11 +3,13 @@ import { AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "../../../router";
 import { useAuthStore } from "../../../../features/auth/useAuthStore";
 import { useCartStore } from "../../../../features/cart/useCartStore";
+import CartDrawer from "../../../../features/cart/CartDrawer";
 import { useCategories, useFeaturedCollections } from "../../../../features/catalog/api";
 import SearchOverlay from "../../../../features/search/SearchOverlay";
 import { useWishlistStore } from "../../../../features/wishlist/useWishlistStore";
 import { site } from "../../../config/site";
 import { useScrolled } from "../../../hooks/useScrolled";
+import { useHeroStore } from "../../../state/useHeroStore";
 import { formatNumber } from "../../../utils/format";
 import { BagIcon, ChevronIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
 import MegaMenu from "./MegaMenu";
@@ -30,7 +32,9 @@ export default function Header({ transparentOnTop }) {
   const { data: collections = [] } = useFeaturedCollections();
   const authed = useAuthStore((s) => s.status === "authenticated");
   const cartCount = useCartStore((s) => s.count);
-  const wishCount = useWishlistStore((s) => s.count);
+  const savedWishCount = useWishlistStore((s) => s.count);
+  const wishCount = authed ? savedWishCount : 0;
+  const heroActive = useHeroStore((s) => s.active);
 
   useEffect(() => {
     setMega(null);
@@ -39,7 +43,7 @@ export default function Header({ transparentOnTop }) {
   }, [location.pathname, location.search]);
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  const solid = !transparentOnTop || scrolled || mega !== null;
+  const solid = !transparentOnTop || (scrolled && !heroActive) || mega !== null;
 
   const hoverOpen = (key) => (e) => {
     if (e.pointerType !== "mouse") return;
@@ -113,6 +117,7 @@ export default function Header({ transparentOnTop }) {
                 ))}
                 <li><Link className={styles.navItem} to="/showroom">شو روم</Link></li>
                 <li><Link className={styles.navItem} to="/shop?on_sale=true">تخفیف‌ها</Link></li>
+                <li><Link className={`${styles.navItem} ${styles.shopLink}`} to="/shop">همه فروشگاه</Link></li>
               </ul>
             </nav>
           </div>
@@ -172,6 +177,7 @@ export default function Header({ transparentOnTop }) {
       <AnimatePresence>
         {searchOpen && <SearchOverlay key="search" onClose={() => setSearchOpen(false)} />}
       </AnimatePresence>
+      <CartDrawer />
     </>
   );
 }

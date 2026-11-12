@@ -1,0 +1,302 @@
+:root,
+html[data-theme="dark"],
+html[data-theme="auto"] {
+  color-scheme: dark;
+  --primary: #9e5363;
+  --secondary: #373238;
+  --accent: #e4bd7b;
+  --primary-fg: #fffaf5;
+  --body-fg: #eee8e2;
+  --body-bg: #171619;
+  --body-quiet-color: #b6adb0;
+  --body-loud-color: #fffaf5;
+  --header-color: #fffaf5;
+  --header-branding-color: #fffaf5;
+  --header-bg: #211f23;
+  --header-link-color: #f3e8dc;
+  --breadcrumbs-fg: #ddd1d2;
+  --breadcrumbs-link-fg: #f5d6a5;
+  --breadcrumbs-bg: #30252b;
+  --link-fg: #e8b5a9;
+  --link-hover-color: #f0c991;
+  --link-selected-fg: #f0c991;
+  --hairline-color: #3a363b;
+  --border-color: #4a4449;
+  --error-fg: #ffaaa3;
+  --message-success-bg: #19382d;
+  --message-warning-bg: #44351e;
+  --message-error-bg: #49282b;
+  --darkened-bg: #211f23;
+  --selected-bg: #392f35;
+  --selected-row: #332b31;
+  --button-fg: #fffaf5;
+  --button-bg: #57414a;
+  --default-button-bg: #873e50;
+  --close-button-bg: #51444a;
+  --delete-button-bg: #8c373a;
+  --object-tools-bg: #57414a;
+  --object-tools-hover-bg: #72505c;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --primary: #742d3c;
+  --secondary: #514b4c;
+  --accent: #8c642b;
+  --primary-fg: #fff;
+  --body-fg: #282326;
+  --body-bg: #f6f3ef;
+  --body-quiet-color: #625a5b;
+  --body-loud-color: #201b1e;
+  --header-color: #fffaf5;
+  --header-branding-color: #fffaf5;
+  --header-bg: #30252b;
+  --header-link-color: #f5e9e1;
+  --breadcrumbs-fg: #f5e9e1;
+  --breadcrumbs-link-fg: #f5d6a5;
+  --breadcrumbs-bg: #60414b;
+  --link-fg: #742d3c;
+  --link-hover-color: #4e1f2b;
+  --link-selected-fg: #4e1f2b;
+  --hairline-color: #e4ddd6;
+  --border-color: #d3cbc3;
+  --error-fg: #a3212a;
+  --message-success-bg: #e5f2e8;
+  --message-warning-bg: #fff2d6;
+  --message-error-bg: #fbe4e3;
+  --darkened-bg: #f0ece7;
+  --selected-bg: #f4e8e9;
+  --selected-row: #f7eeee;
+  --button-fg: #fff;
+  --button-bg: #57414a;
+  --default-button-bg: #742d3c;
+  --close-button-bg: #51444a;
+  --delete-button-bg: #a3343a;
+  --object-tools-bg: #57414a;
+  --object-tools-hover-bg: #72505c;
+}
+
+body {
+  background: var(--body-bg);
+  color: var(--body-fg);
+}
+
+#header {
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: 0 3px 16px rgb(0 0 0 / 16%);
+}
+
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+  color: var(--header-branding-color);
+  font-weight: 650;
+  letter-spacing: 0.015em;
+}
+
+#user-tools,
+#user-tools a {
+  color: var(--header-link-color);
+}
+
+.breadcrumbs {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.module,
+.inline-group,
+#changelist,
+#changelist-filter,
+.selector,
+.submit-row,
+.paginator,
+.object-tools,
+.calendarbox,
+.clockbox,
+.calendar,
+.timebox {
+  border-color: var(--border-color);
+  border-radius: 8px;
+}
+
+.module,
+.inline-group,
+#changelist,
+#changelist-filter,
+.selector,
+.submit-row,
+.paginator,
+.calendarbox,
+.clockbox {
+  background: var(--darkened-bg);
+}
+
+.module h2,
+.module caption,
+.inline-group h2,
+#changelist-filter h2 {
+  border-radius: 7px 7px 0 0;
+  background: var(--secondary);
+  color: var(--body-loud-color);
+}
+
+table thead th {
+  background: var(--darkened-bg);
+  color: var(--body-loud-color);
+}
+
+table tbody tr:nth-child(even),
+.row-form-errors,
+.form-row.errors {
+  background: color-mix(in srgb, var(--darkened-bg) 72%, var(--body-bg));
+}
+
+table tbody tr:hover {
+  background: var(--selected-row);
+}
+
+td,
+th,
+.form-row,
+.aligned label,
+.help,
+.help-tooltip {
+  color: var(--body-fg);
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+textarea,
+select,
+.selector select,
+.vTextField,
+.vLargeTextField {
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--body-bg);
+  color: var(--body-fg);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent);
+  outline: 2px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 1px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--body-quiet-color);
+  opacity: 1;
+}
+
+button,
+input[type="submit"],
+input[type="button"],
+.button,
+a.button,
+.submit-row input,
+.object-tools a {
+  border: 1px solid transparent;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: filter 140ms ease, transform 140ms ease;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.button:hover,
+.object-tools a:hover {
+  filter: brightness(1.13);
+  transform: translateY(-1px);
+}
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline-color: var(--accent);
+}
+
+.object-tools a:link,
+.object-tools a:visited {
+  background: var(--object-tools-bg);
+  color: var(--button-fg);
+}
+
+.selector-chosen h2,
+.selector-chosen {
+  background: color-mix(in srgb, var(--primary) 25%, var(--body-bg));
+}
+
+.messagelist li {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--body-fg);
+}
+
+.messagelist li.success {
+  background: var(--message-success-bg);
+}
+
+.messagelist li.warning {
+  background: var(--message-warning-bg);
+}
+
+.messagelist li.error {
+  background: var(--message-error-bg);
+}
+
+.errornote,
+.errorlist,
+.errors {
+  color: var(--error-fg);
+}
+
+.errornote,
+.errorlist {
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--message-error-bg) 75%, var(--body-bg));
+}
+
+.deletelink,
+a.deletelink:link,
+a.deletelink:visited {
+  border-radius: 5px;
+}
+
+.addlink,
+.changelink,
+.viewlink {
+  filter: saturate(0.8);
+}
+
+#changelist-filter li.selected a {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+#changelist table tbody tr.selected {
+  background: var(--selected-row);
+}
+
+.calendar td a,
+.calendarbox a,
+.clockbox a {
+  color: var(--link-fg);
+}
+
+@media (max-width: 767px) {
+  #header {
+    padding: 12px 14px;
+  }
+
+  .module,
+  .inline-group,
+  #changelist,
+  #changelist-filter {
+    border-radius: 6px;
+  }
+}

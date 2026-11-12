@@ -26,6 +26,7 @@ beforeEach(() => {
 test("renders the hero and every data section", () => {
   render(<HomePage />);
   expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("استایلی که با شما می‌ماند");
+  expect(document.querySelector("video source")).toHaveAttribute("src", "/models/hero-model.mp4?v=2");
   for (const name of ["تازه‌ها", "کالکشن‌های ویژه", "خرید بر اساس دسته‌بندی", "پرفروش‌ها", "پیشنهادهای ویژه", "منتخب فروشگاه"]) {
     expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
   }

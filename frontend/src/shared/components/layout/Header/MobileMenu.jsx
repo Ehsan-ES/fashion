@@ -50,6 +50,7 @@ export default function MobileMenu({ categories, authed, cartCount, wishCount, o
           </motion.li>
         ))}
         <motion.li variants={itemVariants}><Link className={styles.mobileLink} to="/showroom" onClick={onClose}>شو روم</Link></motion.li>
+        <motion.li variants={itemVariants}><Link className={styles.mobileLink} to="/shop" onClick={onClose}>همه فروشگاه</Link></motion.li>
         <motion.li variants={itemVariants}><Link className={styles.mobileLink} to="/shop?on_sale=true" onClick={onClose}>تخفیف‌ها</Link></motion.li>
       </motion.ul>
 

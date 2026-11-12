@@ -1,5 +1,5 @@
-import ComingSoon from "../../src/shared/components/ui/ComingSoon";
+import WishlistPage from "../../src/features/wishlist/WishlistPage";
 
 export default function Page() {
-  return <ComingSoon title="علاقه‌مندی‌ها" stage={9} />;
+  return <WishlistPage />;
 }

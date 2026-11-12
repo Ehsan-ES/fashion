@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 import { useAuthStore } from "../../../../features/auth/useAuthStore";
 import { useCartStore } from "../../../../features/cart/useCartStore";
+import { useHeroStore } from "../../../state/useHeroStore";
+import { useWishlistStore } from "../../../../features/wishlist/useWishlistStore";
 import { searchProducts } from "../../../../features/catalog/api";
 import { setTestUrl } from "../../../../test/router";
 import { formatPrice } from "../../../utils/format";
@@ -35,7 +37,9 @@ beforeEach(() => {
   setTestUrl("/");
   setScroll(0);
   useAuthStore.setState({ user: null, status: "anonymous" });
-  useCartStore.setState({ count: 0 });
+  useWishlistStore.setState({ items: [], count: 0 });
+  useCartStore.setState({ count: 0, items: [], miniCartOpen: false });
+  useHeroStore.setState({ active: false });
 });
 
 test("is transparent on top of the home page and solid elsewhere", () => {
@@ -52,6 +56,15 @@ test("becomes solid and compact after scrolling", async () => {
   fireEvent.scroll(window);
   await waitFor(() => expect(container.querySelector("header")).toHaveAttribute("data-tone", "dark"));
   expect(container.querySelector("header")).toHaveAttribute("data-compact", "true");
+});
+
+test("stays transparent while the hero is pinned, even when scrolled", async () => {
+  useHeroStore.setState({ active: true });
+  const { container } = renderHeader();
+  setScroll(300);
+  fireEvent.scroll(window);
+  await waitFor(() => expect(container.querySelector("header")).toHaveAttribute("data-compact", "true"));
+  expect(container.querySelector("header")).toHaveAttribute("data-tone", "light");
 });
 
 test("mega menu opens with category links, closes with Escape", () => {
@@ -84,6 +97,7 @@ test("mobile menu opens as a dialog and closes", () => {
   fireEvent.click(screen.getByRole("button", { name: "باز کردن منو" }));
   const dialog = screen.getByRole("dialog", { name: "منوی اصلی" });
   expect(dialog).toBeInTheDocument();
+  expect(dialog.querySelector('a[href="/shop"]')).toHaveTextContent("همه فروشگاه");
   expect(screen.getByRole("link", { name: "ورود / ثبت‌نام" })).toHaveAttribute("href", "/login");
 
   fireEvent.click(screen.getByRole("button", { name: "بستن منو" }));
@@ -106,9 +120,46 @@ test("search overlay shows live results from the API", async () => {
 });
 
 test("cart badge and account link reflect state", () => {
-  useCartStore.setState({ count: 3 });
+  useCartStore.setState({ count: 3, items: [], miniCartOpen: false });
   useAuthStore.setState({ user: { phone: "09123456789" }, status: "authenticated" });
   renderHeader();
   expect(screen.getByRole("link", { name: "سبد خرید، ۳ محصول" })).toHaveAttribute("href", "/cart");
   expect(screen.getByRole("link", { name: "حساب کاربری" })).toHaveAttribute("href", "/account");
+});
+
+test("hides the saved-item count while signed out but keeps saved items", () => {
+  useWishlistStore.setState({ items: [{ id: 1 }, { id: 2 }], count: 2 });
+  const { container } = renderHeader();
+  const favorites = screen.getByRole("link", { name: "علاقه‌مندی‌ها" });
+  expect(favorites).toHaveAttribute("href", "/wishlist");
+  expect(favorites).not.toHaveTextContent(/\d/);
+  expect(useWishlistStore.getState().items).toHaveLength(2);
+  expect(container.querySelectorAll("header .badge")).toHaveLength(0);
+});
+
+test("hides the saved-item count immediately after logout", () => {
+  useAuthStore.setState({ user: { phone: "09123456789" }, status: "authenticated" });
+  useWishlistStore.setState({ items: [{ id: 1 }, { id: 2 }], count: 2 });
+  const { container } = renderHeader();
+
+  expect(screen.getByRole("link", { name: "علاقه‌مندی‌ها" })).toHaveTextContent("۲");
+  act(() => useAuthStore.setState({ user: null, status: "anonymous" }));
+  expect(screen.getByRole("link", { name: "علاقه‌مندی‌ها" })).not.toHaveTextContent(/\d/);
+  expect(container.querySelectorAll("header .badge")).toHaveLength(0);
+});
+
+test("hides the saved-item count in the mobile menu while signed out", () => {
+  useWishlistStore.setState({ items: [{ id: 1 }, { id: 2 }], count: 2 });
+  renderHeader();
+  fireEvent.click(screen.getByRole("button", { name: "باز کردن منو" }));
+
+  const favorites = screen.getByRole("dialog", { name: "منوی اصلی" })
+    .querySelector('a[href="/wishlist"]');
+  expect(favorites).toHaveTextContent("علاقه‌مندی‌ها");
+  expect(favorites).not.toHaveTextContent(/\d/);
+});
+
+test("offers a direct link to the full shop in the desktop navigation", () => {
+  renderHeader();
+  expect(screen.getByRole("link", { name: "همه فروشگاه" })).toHaveAttribute("href", "/shop");
 });

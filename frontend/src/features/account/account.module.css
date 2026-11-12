@@ -1,0 +1,51 @@
+.page { max-width: var(--container); min-height: 65vh; margin-inline: auto; padding: var(--space-6) var(--gutter) var(--space-8); }
+.heading { margin-block-end: var(--space-5); }
+.eyebrow { margin: 0 0 var(--space-2); color: var(--oxblood-text); font-family: var(--font-display); font-size: 0.72rem; letter-spacing: 0.18em; }
+.heading h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 500; }
+.layout { display: grid; align-items: start; gap: var(--space-5); }
+.profile { width: 100%; padding: var(--space-4); border: 1px solid var(--sand); background: var(--paper); }
+.orders { min-width: 0; padding: var(--space-4); border: 1px solid var(--stone); background: rgba(232, 229, 223, 0.22); }
+.ordersHeader { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2); margin-block-end: var(--space-3); }
+.ordersHeader h2 { font-size: 1.35rem; font-weight: 500; }
+.ordersCount { margin: 0; color: #777; font-size: 0.82rem; }
+.orderList { display: grid; gap: var(--space-3); }
+.order { min-width: 0; padding: var(--space-3); border: 1px solid var(--stone); background: var(--paper); }
+.orderHeader { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-2); padding-block-end: var(--space-2); border-block-end: 1px solid var(--stone); }
+.orderNumber { display: grid; gap: 2px; min-width: 0; }
+.orderNumber span { color: #777; font-size: 0.74rem; }
+.orderNumber bdi { font-size: 0.78rem; overflow-wrap: anywhere; }
+.status { display: inline-flex; min-height: 28px; align-items: center; padding-inline: 9px; background: var(--stone); font-size: 0.73rem; white-space: nowrap; }
+.status[data-status="pending"] { background: #f0e6d3; color: #6b5128; }
+.status[data-status="paid"] { background: #e4eee5; color: #315a3a; }
+.status[data-status="cancelled"] { background: #eee5e5; color: #772f36; }
+.orderMeta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); margin-block: var(--space-2); color: #666; font-size: 0.8rem; }
+.orderTotal { color: var(--ink); font-size: 0.9rem; font-weight: 600; }
+.items { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.item { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 0.82rem; }
+.itemName { min-width: 0; }
+.itemVariant { color: #777; font-size: 0.76rem; }
+.itemPrice { flex: 0 0 auto; white-space: nowrap; }
+.orderFooter { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block-start: var(--space-3); padding-block-start: var(--space-2); border-block-start: 1px solid var(--stone); }
+.address details { font-size: 0.8rem; }
+.address summary { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.address p { margin-block: var(--space-2) 0; color: #666; line-height: 1.8; }
+.invoiceDetails { margin-block-start: var(--space-3); padding-block-start: var(--space-2); border-block-start: 1px solid var(--stone); }
+.invoiceDetails summary { color: var(--oxblood-text); font-size: 0.82rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.invoiceDetails > article { margin-block-start: var(--space-3); }
+.paymentNotice { margin: 0 0 var(--space-4); padding: var(--space-3); background: rgba(232, 229, 223, 0.5); }
+.cancel { min-height: 38px; padding-inline: var(--space-2); border: 1px solid #8d2929; background: transparent; color: #8d2929; font: inherit; font-size: 0.8rem; cursor: pointer; }
+.cancel:hover { background: #8d2929; color: var(--paper); }
+.cancel:disabled { opacity: 0.55; cursor: wait; }
+.confirm { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: #752c36; font-size: 0.8rem; }
+.confirm button { min-height: 36px; padding-inline: var(--space-2); border: 1px solid #8d2929; background: #8d2929; color: var(--paper); font: inherit; cursor: pointer; }
+.confirm button:last-child { background: transparent; color: inherit; }
+.state { display: grid; justify-items: center; gap: var(--space-2); padding: var(--space-5) var(--space-2); color: #666; text-align: center; }
+.state p { margin: 0; }
+.state a, .retry { color: var(--oxblood-text); text-decoration: underline; text-underline-offset: 3px; }
+.retry { border: 0; background: transparent; font: inherit; cursor: pointer; }
+.error { margin: var(--space-2) 0 0; color: #9b1c1c; font-size: 0.82rem; }
+
+@media (min-width: 900px) {
+  .layout { grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr); gap: var(--space-5); }
+  .profile, .orders { padding: var(--space-5); }
+}

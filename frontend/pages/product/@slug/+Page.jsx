@@ -1,5 +1,5 @@
-import ComingSoon from "../../../src/shared/components/ui/ComingSoon";
+import ProductPage from "../../../src/features/catalog/ProductPage";
 
 export default function Page() {
-  return <ComingSoon title="جزئیات محصول" stage={7} />;
+  return <ProductPage />;
 }

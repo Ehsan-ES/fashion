@@ -1,5 +1,5 @@
-import ComingSoon from "../../src/shared/components/ui/ComingSoon";
+import Showroom from "../../src/features/showroom/Showroom";
 
 export default function Page() {
-  return <ComingSoon title="شو روم مجازی" stage={14} />;
+  return <Showroom />;
 }

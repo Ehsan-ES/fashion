@@ -8,16 +8,17 @@ import styles from "./MainLayout.module.css";
 export default function MainLayout({ children }) {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
+  const isShowroom = pathname === "/showroom";
 
   return (
     <>
       <SmoothScroll />
-      <a href="#main" className={styles.skip}>پرش به محتوا</a>
-      <Header transparentOnTop={isHome} />
-      <main id="main" key={pathname} className={isHome ? styles.main : `${styles.main} ${styles.offset}`}>
+      {!isShowroom && <a href="#main" className={styles.skip}>پرش به محتوا</a>}
+      {!isShowroom && <Header transparentOnTop={isHome} />}
+      <main id="main" key={pathname} className={`${styles.main}${!isHome && !isShowroom ? ` ${styles.offset}` : ""}`}>
         {children}
       </main>
-      <Footer />
+      {!isShowroom && <Footer />}
     </>
   );
 }

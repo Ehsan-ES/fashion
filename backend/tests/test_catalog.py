@@ -2,12 +2,14 @@ from datetime import timedelta
 from io import BytesIO
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils import timezone
 from PIL import Image
+from rest_framework.test import APIClient
 
-from apps.catalog.models import Product, ProductImage, ProductVariant
+from apps.catalog.models import Product, ProductAnswer, ProductImage, ProductQuestion, ProductReview, ProductVariant
 from apps.inventory.models import Inventory
 
 from .factories import make_brand, make_category, make_color, make_product
@@ -233,6 +235,20 @@ def test_related_excludes_self_and_other_categories(client):
     assert [p["slug"] for p in res.json()] == ["b"]
 
 
+def test_complete_the_look_prioritizes_other_categories_from_same_collection(client):
+    from apps.catalog.models import Collection
+
+    top = make_product(slug="top")
+    matching_top = make_product(slug="matching-top", category=top.category)
+    pants = make_product(slug="matching-pants", category=make_category("pants", "شلوار"))
+    collection = Collection.objects.create(name="Spring Look", slug="spring-look")
+    collection.products.add(top, matching_top, pants)
+
+    response = client.get(f"{LIST}{top.slug}/complete-the-look/")
+    assert response.status_code == 200
+    assert [product["slug"] for product in response.json()] == ["matching-pants", "matching-top"]
+
+
 # ---------- Facets و سایر endpointها
 def test_facets(client):
     make_product(slug="a", price=1_000_000, variants=(("black", "M", 3),), brand=make_brand("b1", "B1"))
@@ -268,6 +284,53 @@ def test_brands_and_collections_endpoints(client):
     cols = client.get("/api/collections/").json()
     assert [c["slug"] for c in cols] == ["spring"] and cols[0]["product_count"] == 1
     assert len(client.get("/api/collections/", {"featured": "1"}).json()) == 1
+
+
+def test_product_reviews_require_auth_and_moderation(client):
+    product = make_product(slug="reviewable")
+    endpoint = f"{LIST}{product.slug}/reviews/"
+    assert client.get(endpoint).json() == {"count": 0, "average": None, "results": []}
+    assert client.post(endpoint, {"rating": 5, "body": "عالی"}, content_type="application/json").status_code == 401
+
+    user = get_user_model().objects.create_user(phone="09123456789")
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+    response = api_client.post(endpoint, {"rating": 5, "title": "کیفیت خوب", "body": "پارچه بسیار خوبی دارد."}, format="json")
+    assert response.status_code == 201
+    assert response.json()["detail"] == "نظر شما پس از بررسی منتشر می‌شود."
+    assert api_client.post(endpoint, {"rating": 4, "body": "نظر دوم"}, format="json").status_code == 400
+    assert api_client.post(endpoint, {"rating": 6, "body": "امتیاز نامعتبر"}, format="json").status_code == 400
+    assert api_client.post(endpoint, {"rating": 4, "body": "  "}, format="json").status_code == 400
+    assert client.get(endpoint).json()["count"] == 0
+
+    ProductReview.objects.filter(product=product, user=user).update(is_approved=True)
+    result = client.get(endpoint).json()
+    assert result["count"] == 1
+    assert result["average"] == 5
+    assert result["results"][0]["author"] == "مشتری بوتیک"
+
+
+def test_product_questions_and_answers_require_moderation(client):
+    product = make_product(slug="questionable")
+    endpoint = f"{LIST}{product.slug}/questions/"
+    assert client.post(endpoint, {"body": "موجودی این محصول چطور است؟"}, content_type="application/json").status_code == 401
+
+    user = get_user_model().objects.create_user(phone="09123456789")
+    api_client = APIClient()
+    api_client.force_authenticate(user)
+    response = api_client.post(endpoint, {"body": "موجودی این محصول چطور است؟"}, format="json")
+    assert response.status_code == 201
+    assert client.get(endpoint).json()["results"] == []
+
+    question = ProductQuestion.objects.get(pk=response.json()["id"])
+    question.is_approved = True
+    question.save(update_fields=["is_approved"])
+    ProductAnswer.objects.create(question=question, body="پاسخ در انتظار تأیید")
+    assert client.get(endpoint).json()["results"][0]["answers"] == []
+    ProductAnswer.objects.filter(question=question).update(body="بله، موجود است.", is_approved=True)
+    result = client.get(endpoint).json()
+    assert result["count"] == 1
+    assert result["results"][0]["answers"][0]["body"] == "بله، موجود است."
 
 
 # ---------- عملکرد

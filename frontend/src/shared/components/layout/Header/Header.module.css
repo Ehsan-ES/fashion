@@ -71,6 +71,7 @@
 .navItem:hover::after, .navItem[aria-expanded="true"]::after { transform: scaleX(1); }
 .navItem svg { transition: transform var(--dur-fast) var(--ease); }
 .navItem[aria-expanded="true"] svg { transform: rotate(180deg); }
+.shopLink { padding-inline: 10px; border: 1px solid currentColor; }
 
 .iconBtn {
   position: relative;
@@ -105,6 +106,11 @@
   .nav { display: block; }
   .desktopOnly { display: inline-grid; }
   .mobileOnly { display: none; }
+}
+@media (min-width: 960px) and (max-width: 1120px) {
+  .nav ul { gap: var(--space-3); }
+  .navItem { font-size: 0.85rem; }
+  .start { gap: var(--space-2); }
 }
 
 /* ---------- Mega Menu ---------- */

@@ -1,12 +1,13 @@
-from django.db.models import Count, F, Max, Min, Q
+from django.db.models import Avg, Case, Count, F, IntegerField, Max, Min, Prefetch, Q, Value, When
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 
 from .filters import ProductFilter, StableOrderingFilter
-from .models import Brand, Category, Collection, Color, Product, Size
+from .models import Brand, Category, Collection, Color, Product, ProductAnswer, ProductQuestion, ProductReview, Size
 from .selectors import product_queryset
 from .serializers import (
     BrandSerializer,
@@ -15,6 +16,10 @@ from .serializers import (
     ColorSerializer,
     ProductDetailSerializer,
     ProductListSerializer,
+    ProductQuestionCreateSerializer,
+    ProductQuestionSerializer,
+    ProductReviewCreateSerializer,
+    ProductReviewSerializer,
     SizeSerializer,
 )
 
@@ -91,6 +96,81 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             .order_by("-is_best_seller", "-sales_count", "-id")[:8]
         )
         return Response(ProductListSerializer(qs, many=True, context=self.get_serializer_context()).data)
+
+    @action(detail=True, url_path="complete-the-look")
+    def complete_the_look(self, request, slug=None):
+        product = self.get_object()
+        collection_ids = product.collections.filter(is_active=True).values("pk")
+        qs = (
+            self.get_queryset()
+            .filter(collections__in=collection_ids)
+            .exclude(pk=product.pk)
+            .annotate(
+                same_category=Case(
+                    When(category_id=product.category_id, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+            .order_by("same_category", "-is_best_seller", "-sales_count", "-id")
+            .distinct()
+        )
+        if not qs.exists():
+            qs = (
+                self.get_queryset()
+                .filter(category_id=product.category_id)
+                .exclude(pk=product.pk)
+                .order_by("-is_best_seller", "-sales_count", "-id")
+            )
+        return Response(ProductListSerializer(qs[:8], many=True, context=self.get_serializer_context()).data)
+
+    @action(detail=True, methods=["get", "post"])
+    def reviews(self, request, slug=None):
+        product = self.get_object()
+        if request.method == "POST":
+            if not request.user.is_authenticated:
+                raise NotAuthenticated()
+            serializer = ProductReviewCreateSerializer(
+                data=request.data, context={"request": request, "product": product},
+            )
+            serializer.is_valid(raise_exception=True)
+            review = serializer.save(product=product, user=request.user)
+            return Response(
+                {"detail": "نظر شما پس از بررسی منتشر می‌شود.", "id": review.pk},
+                status=201,
+            )
+
+        reviews = ProductReview.objects.filter(product=product, is_approved=True).select_related("user")
+        summary = reviews.aggregate(average=Avg("rating"))
+        return Response({
+            "count": reviews.count(),
+            "average": round(summary["average"], 1) if summary["average"] is not None else None,
+            "results": ProductReviewSerializer(reviews[:20], many=True).data,
+        })
+
+    @action(detail=True, methods=["get", "post"])
+    def questions(self, request, slug=None):
+        product = self.get_object()
+        if request.method == "POST":
+            if not request.user.is_authenticated:
+                raise NotAuthenticated()
+            serializer = ProductQuestionCreateSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            question = serializer.save(product=product, user=request.user)
+            return Response(
+                {"detail": "پرسش شما پس از بررسی منتشر می‌شود.", "id": question.pk},
+                status=201,
+            )
+
+        questions = (
+            ProductQuestion.objects.filter(product=product, is_approved=True)
+            .select_related("user")
+            .prefetch_related(Prefetch("answers", queryset=ProductAnswer.objects.filter(is_approved=True)))
+        )
+        return Response({
+            "count": questions.count(),
+            "results": ProductQuestionSerializer(questions[:20], many=True).data,
+        })
 
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):

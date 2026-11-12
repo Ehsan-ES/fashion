@@ -1,9 +1,14 @@
+import { useEffect } from "react";
 import { Navigate, useLocation } from "../../shared/router";
 import { useAuthStore } from "./useAuthStore";
 
 export default function RequireAuth({ children }) {
   const status = useAuthStore((s) => s.status);
+  const bootstrap = useAuthStore((s) => s.bootstrap);
   const location = useLocation();
+  useEffect(() => {
+    if (status === "idle") bootstrap();
+  }, [status, bootstrap]);
   if (status === "idle" || status === "loading") return <p role="status" style={{ padding: "var(--space-6)" }}>در حال بارگذاری...</p>;
   if (status !== "authenticated") {
     const next = encodeURIComponent(`${location.pathname}${location.search}`);

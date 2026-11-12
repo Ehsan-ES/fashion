@@ -190,6 +190,11 @@ class ProductVariant(models.Model):
         "قیمت اختصاصی", max_digits=12, decimal_places=0, null=True, blank=True,
         help_text="اگر پر شود، Variant با همین قیمت و بدون تخفیف فروخته می‌شود.",
     )
+    cost_price = models.DecimalField(
+        "بهای تمام‌شده (تومان)", max_digits=12, decimal_places=0, null=True, blank=True,
+        validators=[MinValueValidator(0)],
+        help_text="برای گزارش سود؛ برای هر ترکیب رنگ و سایز ثبت شود.",
+    )
     is_active = models.BooleanField("فعال", default=True)
 
     class Meta:
@@ -211,6 +216,62 @@ class ProductVariant(models.Model):
         if self.price_override is not None:
             return self.price_override
         return self.product.current_price
+
+
+class ProductReview(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="product_reviews")
+    rating = models.PositiveSmallIntegerField("امتیاز")
+    title = models.CharField("عنوان", max_length=120, blank=True)
+    body = models.TextField("متن نظر", max_length=2000)
+    is_approved = models.BooleanField("تأیید شده", default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        constraints = [
+            models.UniqueConstraint(fields=["product", "user"], name="uniq_product_review_user"),
+            models.CheckConstraint(condition=models.Q(rating__gte=1, rating__lte=5), name="product_review_rating_1_5"),
+        ]
+        indexes = [models.Index(fields=["product", "is_approved", "-created_at"])]
+        verbose_name = "نظر محصول"
+        verbose_name_plural = "نظرهای محصول"
+
+    def __str__(self):
+        return f"{self.product} · {self.rating}/5"
+
+
+class ProductQuestion(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="questions")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="product_questions")
+    body = models.TextField("پرسش", max_length=1000)
+    is_approved = models.BooleanField("تأیید شده", default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-id"]
+        indexes = [models.Index(fields=["product", "is_approved", "-created_at"])]
+        verbose_name = "پرسش محصول"
+        verbose_name_plural = "پرسش‌های محصول"
+
+    def __str__(self):
+        return f"{self.product} · {self.body[:40]}"
+
+
+class ProductAnswer(models.Model):
+    question = models.ForeignKey(ProductQuestion, on_delete=models.CASCADE, related_name="answers")
+    body = models.TextField("پاسخ", max_length=2000)
+    is_approved = models.BooleanField("تأیید شده", default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at", "id"]
+        indexes = [models.Index(fields=["question", "is_approved"])]
+        verbose_name = "پاسخ پرسش محصول"
+        verbose_name_plural = "پاسخ‌های پرسش محصول"
+
+    def __str__(self):
+        return f"پاسخ #{self.pk} به پرسش #{self.question_id}"
 
 
 class Collection(models.Model):

@@ -54,7 +54,7 @@ export default function MegaMenu({ gender, categories, collections, onPointerEnt
         {tiles.length > 0 && (
           <div className={styles.tiles}>
             {tiles.map((c) => (
-              <Link key={c.id} to={`${base}&category=${c.slug}`} className={styles.tile} onClick={onNavigate}>
+              <Link key={c.id} to={`${base}&category=${c.slug}`} className={styles.tile} onClick={onNavigate} aria-hidden="true" tabIndex={-1}>
                 <img src={c.image} alt="" loading="lazy" width="300" height="400" />
                 <span>{c.name}</span>
               </Link>

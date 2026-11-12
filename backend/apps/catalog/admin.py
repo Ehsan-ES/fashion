@@ -5,7 +5,10 @@ from django.utils.html import format_html
 
 from apps.inventory.models import Inventory
 
-from .models import Brand, Category, Collection, Color, Product, ProductImage, ProductVariant, Size
+from .models import (
+    Brand, Category, Collection, Color, Product, ProductAnswer, ProductImage,
+    ProductQuestion, ProductReview, ProductVariant, Size,
+)
 
 
 @admin.register(Category)
@@ -80,7 +83,39 @@ class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
     form = VariantInlineForm
     extra = 0
-    fields = ("color", "size", "sku", "price_override", "is_active", "stock")
+    fields = ("color", "size", "sku", "price_override", "cost_price", "is_active", "stock")
+
+
+class ProductAnswerInline(admin.TabularInline):
+    model = ProductAnswer
+    extra = 0
+    fields = ("body", "is_approved", "created_at")
+    readonly_fields = ("created_at",)
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    list_display = ("product", "user", "rating", "title", "is_approved", "created_at")
+    list_filter = ("is_approved", "rating", "created_at")
+    list_editable = ("is_approved",)
+    search_fields = ("product__name", "user__phone", "title", "body")
+    autocomplete_fields = ("product", "user")
+    readonly_fields = ("created_at",)
+
+
+@admin.register(ProductQuestion)
+class ProductQuestionAdmin(admin.ModelAdmin):
+    list_display = ("product", "user", "short_body", "is_approved", "created_at")
+    list_filter = ("is_approved", "created_at")
+    list_editable = ("is_approved",)
+    search_fields = ("product__name", "user__phone", "body")
+    autocomplete_fields = ("product", "user")
+    readonly_fields = ("created_at",)
+    inlines = [ProductAnswerInline]
+
+    @admin.display(description="پرسش")
+    def short_body(self, obj):
+        return obj.body[:80]
 
 
 @admin.register(Product)

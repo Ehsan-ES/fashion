@@ -9,6 +9,8 @@ export default function SmoothScroll() {
   useEffect(() => {
     if (import.meta.env.MODE === "test") return undefined;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    // عیب‌یابی: افزودن ?smooth=off به آدرس، اسکرول نرم را خاموش می‌کند
+    if (new URLSearchParams(window.location.search).get("smooth") === "off") return undefined;
 
     gsap.registerPlugin(ScrollTrigger);
     const lenis = new Lenis({

@@ -1,0 +1,225 @@
+{% extends "admin/base_site.html" %}
+{% load accounting_tags %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .accounting { --report-ink: #eee8e2; --report-muted: #b6adb0; --report-line: #454047; --report-accent: #e8b5a9; --report-panel: #211f23; --report-head: #302d32; --report-hover: #302830; --report-profit: #91d3a8; --report-warning: #e9c27f; color: var(--report-ink); }
+    html[data-theme="light"] .accounting { --report-ink: #292521; --report-muted: #77716a; --report-line: #e9e4dc; --report-accent: #742d3c; --report-panel: #fff; --report-head: #f7f5f1; --report-hover: #fcfbf9; --report-profit: #276343; --report-warning: #9a5c1a; }
+    .accounting * { box-sizing: border-box; }
+    .report-intro { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin: 8px 0 24px; }
+    .report-intro h1 { margin: 0 0 5px; font-size: 24px; font-weight: 600; }
+    .report-intro p { margin: 0; color: var(--report-muted); }
+    .report-filter { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 22px; padding: 18px; border: 1px solid var(--report-line); border-radius: 10px; background: var(--report-panel); }
+    .report-filter label { display: grid; gap: 5px; color: var(--report-muted); font-size: 12px; }
+    .report-filter input { min-height: 38px; padding: 5px 9px; border: 1px solid var(--report-line); border-radius: 5px; background: var(--report-head); color: var(--report-ink); color-scheme: inherit; }
+    .report-filter .button { min-height: 38px; padding: 8px 14px; border-radius: 5px; }
+    .report-filter .download { border-color: var(--report-accent); background: var(--report-accent); color: #fff; }
+    .report-section { margin: 24px 0; }
+    .report-section h2 { margin: 0 0 12px; font-size: 17px; }
+    .section-hint { margin: -5px 0 12px; color: var(--report-muted); font-size: 12px; }
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 12px; }
+    .metric-card { min-width: 0; padding: 17px; border: 1px solid var(--report-line); border-radius: 10px; background: var(--report-panel); box-shadow: 0 2px 8px rgba(0, 0, 0, .12); }
+    .metric-label { display: block; color: var(--report-muted); font-size: 12px; }
+    .metric-value { display: block; margin-top: 8px; font-size: clamp(18px, 2vw, 23px); font-weight: 700; overflow-wrap: anywhere; }
+    .metric-value small { color: var(--report-muted); font-size: 12px; font-weight: 400; }
+    .metric-sub { display: block; margin-top: 6px; color: var(--report-muted); font-size: 11px; }
+    .status-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .status-chip { display: inline-flex; gap: 7px; align-items: center; padding: 7px 10px; border: 1px solid var(--report-line); border-radius: 20px; background: var(--report-panel); font-size: 12px; }
+    .status-chip b { font-size: 13px; }
+    .report-panel { overflow: hidden; border: 1px solid var(--report-line); border-radius: 10px; background: var(--report-panel); }
+    .report-scroll { overflow-x: auto; }
+    .report-table { width: 100%; margin: 0; border-collapse: collapse; }
+    .report-table th, .report-table td { padding: 11px 12px; border-bottom: 1px solid var(--report-line); text-align: right; vertical-align: top; white-space: nowrap; }
+    .report-table thead th { background: var(--report-head); color: var(--report-ink); font-size: 11px; font-weight: 600; }
+    .report-table tbody td, .report-table tbody th { font-size: 12px; }
+    .report-table tbody tr:last-child td, .report-table tbody tr:last-child th { border-bottom: 0; }
+    .report-table tbody tr:hover { background: var(--report-hover); }
+    .report-table .wrap-cell { min-width: 190px; white-space: normal; line-height: 1.8; }
+    .report-table .muted { display: block; margin-top: 3px; color: var(--report-muted); font-size: 11px; }
+    .report-table .number { direction: ltr; text-align: left; }
+    .report-table .profit { color: var(--report-profit); font-weight: 600; }
+    .report-table .missing { color: var(--report-warning); }
+    .order-link { color: var(--report-accent); font-weight: 600; text-decoration: none; }
+    .order-link:hover { text-decoration: underline; }
+    .empty-row { padding: 24px !important; color: var(--report-muted); text-align: center !important; }
+    .report-note { padding: 13px 15px; border-right: 3px solid #b18b52; border-radius: 5px; background: #3b3326; color: #f2d9a9; font-size: 12px; line-height: 1.9; }
+    .report-note.success { border-color: #5a8967; background: #21362a; color: #bee4c7; }
+    html[data-theme="light"] .report-note { background: #faf6ed; color: #65573e; }
+    html[data-theme="light"] .report-note.success { background: #f1f7f2; color: #42604a; }
+    .report-note p { margin: 0; }
+    @media (max-width: 767px) {
+      .report-filter { align-items: stretch; }
+      .report-filter label, .report-filter input, .report-filter .button { width: 100%; }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .metric-card { padding: 13px; }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="accounting" dir="rtl">
+  <header class="report-intro">
+    <div>
+      <h1>گزارش فروش و عملکرد</h1>
+      <p>تصویر روشن‌تری از فروش، تخفیف‌ها، کالاهای پرفروش و وضعیت سفارش‌ها داشته باشید.</p>
+    </div>
+  </header>
+
+  <form method="get" class="report-filter">
+    <label for="id_start">از تاریخ
+      <input id="id_start" type="date" name="start" value="{{ start_date }}" required>
+    </label>
+    <label for="id_end">تا تاریخ
+      <input id="id_end" type="date" name="end" value="{{ end_date }}" required>
+    </label>
+    <button type="submit" class="button">اعمال بازه</button>
+    <a class="button download" href="{{ csv_url }}">دانلود گزارش کامل CSV</a>
+    {% if date_error %}<p class="errornote">{{ date_error }}</p>{% endif %}
+  </form>
+
+  <section class="report-section">
+    <h2>خلاصه عملکرد بازه</h2>
+    <p class="section-hint">همه‌ی مبالغ به تومان هستند؛ فروش و سود بر اساس سفارش‌های پرداخت‌شده محاسبه می‌شوند.</p>
+    <div class="metric-grid">
+      <article class="metric-card">
+        <span class="metric-label">فروش ثبت‌شده</span>
+        <strong class="metric-value">{{ report.totals.revenue|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">پس از کسر کدهای تخفیف</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">مبلغ وصول‌شده</span>
+        <strong class="metric-value">{{ report.totals.collected|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">جمع سفارش‌های پرداخت‌شده</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">سفارش‌های پرداخت‌شده</span>
+        <strong class="metric-value">{{ report.totals.orders|toman }}</strong>
+        <span class="metric-sub">از {{ report.totals.all_orders|toman }} سفارش ثبت‌شده در این بازه</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">واحد کالای فروخته‌شده</span>
+        <strong class="metric-value">{{ report.totals.units|toman }}</strong>
+        <span class="metric-sub">میانگین فروش هر واحد: {{ report.totals.average_unit_revenue|toman }} تومان</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">میانگین مبلغ سفارش</span>
+        <strong class="metric-value">{{ report.totals.average_order_value|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">بر اساس سفارش‌های پرداخت‌شده</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">تخفیف‌های اعمال‌شده</span>
+        <strong class="metric-value">{{ report.totals.discounts|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">محصول: {{ report.totals.product_discount|toman }} · کد تخفیف: {{ report.totals.coupon_discount|toman }}</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">بهای تمام‌شده‌ی قابل محاسبه</span>
+        <strong class="metric-value">{{ report.totals.cost|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">{{ report.totals.cost_complete_orders|toman }} سفارش با اطلاعات کامل</span>
+      </article>
+      <article class="metric-card">
+        <span class="metric-label">سود ناخالص سفارش‌های کامل</span>
+        <strong class="metric-value">{{ report.totals.profit|toman }} <small>تومان</small></strong>
+        <span class="metric-sub">
+          {% if report.totals.profit_margin != None %}حاشیه سود در سفارش‌های کامل: {{ report.totals.profit_margin }}٪{% else %}برای نمایش حاشیه سود، بهای تمام‌شده را ثبت کنید.{% endif %}
+        </span>
+      </article>
+    </div>
+    <div class="status-row" aria-label="تعداد سفارش‌ها بر اساس وضعیت">
+      {% for status in report.statuses %}
+        <span class="status-chip">{{ status.label }} <b>{{ status.count|toman }}</b></span>
+      {% endfor %}
+      <span class="status-chip">سفارش‌های دارای تخفیف <b>{{ report.totals.discounted_orders|toman }}</b></span>
+    </div>
+  </section>
+
+  {% if report.totals.incomplete_orders %}
+    <aside class="report-note">
+      <p><strong>برای سود کامل، بهای تمام‌شده را تکمیل کنید.</strong> سود فقط برای سفارش‌هایی محاسبه شده که بهای تمام‌شده‌ی همه‌ی اقلامشان ثبت شده است. {{ report.totals.incomplete_orders|toman }} سفارش پرداخت‌شده اطلاعات هزینه‌ی ناقص دارند و در جمع سود نیامده‌اند.</p>
+    </aside>
+  {% else %}
+    <aside class="report-note success">
+      <p>بهای تمام‌شده‌ی تمام سفارش‌های پرداخت‌شده‌ی این بازه ثبت شده است. سود نمایش‌داده‌شده ناخالص است و هزینه‌های ارسال، مرجوعی، کارمزد و هزینه‌های عملیاتی را در بر نمی‌گیرد.</p>
+    </aside>
+  {% endif %}
+
+  <section class="report-section">
+    <h2>روند ماهانه</h2>
+    <div class="report-panel report-scroll">
+      <table class="report-table">
+        <thead><tr>
+          <th>ماه</th><th>سفارش پرداخت‌شده</th><th>واحد فروش</th><th>فروش</th>
+          <th>تخفیف محصول</th><th>کد تخفیف</th><th>وصول‌شده</th>
+          <th>بهای تمام‌شده</th><th>سود ناخالص</th><th>میانگین سفارش</th><th>هزینه ناقص</th>
+        </tr></thead>
+        <tbody>
+          {% for month in report.months %}
+            <tr>
+              <th>{{ month.month }}</th>
+              <td>{{ month.orders|toman }}</td><td>{{ month.units|toman }}</td>
+              <td>{{ month.revenue|toman }}</td><td>{{ month.product_discount|toman }}</td>
+              <td>{{ month.coupon_discount|toman }}</td><td>{{ month.collected|toman }}</td>
+              <td>{{ month.cost|toman }}</td><td class="profit">{{ month.profit|toman }}</td>
+              <td>{{ month.average_order_value|toman }}</td><td class="missing">{{ month.incomplete_orders|toman }}</td>
+            </tr>
+          {% empty %}
+            <tr><td class="empty-row" colspan="11">در این بازه سفارشی پرداخت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <h2>کالاها و ترکیب‌های پرفروش</h2>
+    <p class="section-hint">هر ردیف بر اساس محصول و SKU نمایش داده می‌شود؛ سفارش‌های پرداخت‌شده در محاسبه لحاظ شده‌اند.</p>
+    <div class="report-panel report-scroll">
+      <table class="report-table">
+        <thead><tr><th>محصول</th><th>SKU</th><th>دسته‌بندی</th><th>واحد</th><th>سفارش</th><th>فروش پس از تخفیف</th><th>بهای تمام‌شده</th><th>سود ناخالص</th></tr></thead>
+        <tbody>
+          {% for product in report.products %}
+            <tr>
+              <td class="wrap-cell">{{ product.name }}</td><td>{{ product.sku }}</td><td>{{ product.category }}</td>
+              <td>{{ product.units|toman }}</td><td>{{ product.orders|toman }}</td>
+              <td>{{ product.revenue|toman }} تومان</td>
+              {% if product.cost_complete %}
+                <td>{{ product.cost|toman }} تومان</td><td class="profit">{{ product.profit|toman }} تومان</td>
+              {% else %}
+                <td class="missing">اطلاعات ناقص</td><td class="missing">نامشخص</td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr><td class="empty-row" colspan="8">در این بازه کالایی فروخته نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="report-section">
+    <h2>جزئیات سفارش‌ها</h2>
+    <p class="section-hint">برای بازکردن پرونده‌ی هر سفارش، روی شماره آن کلیک کنید.</p>
+    <div class="report-panel report-scroll">
+      <table class="report-table">
+        <thead><tr><th>سفارش</th><th>زمان</th><th>مشتری</th><th>وضعیت سفارش</th><th>وضعیت پرداخت</th><th>اقلام</th><th>مبلغ سفارش</th><th>وصول‌شده</th><th>سود ناخالص</th></tr></thead>
+        <tbody>
+          {% for order in report.order_details %}
+            <tr>
+              <td><a class="order-link" href="{% url 'admin:orders_order_change' order.pk %}"><bdi dir="ltr">{{ order.number|slice:":8" }}</bdi></a></td>
+              <td>{{ order.created }}</td>
+              <td>{{ order.customer }}<span class="muted"><bdi dir="ltr">{{ order.phone }}</bdi></span></td>
+              <td>{{ order.status }}</td><td>{{ order.payment_status }}</td>
+              <td class="wrap-cell">{% for item in order.items %}{{ item }}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</td>
+              <td>{{ order.order_total|toman }} تومان</td>
+              <td>{{ order.collected|toman }} تومان</td>
+              <td>{% if order.status_code == "paid" and order.cost_complete %}<span class="profit">{{ order.profit|toman }} تومان</span>{% elif order.status_code == "paid" %}<span class="missing">هزینه ناقص</span>{% else %}—{% endif %}</td>
+            </tr>
+          {% empty %}
+            <tr><td class="empty-row" colspan="9">در این بازه سفارشی ثبت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

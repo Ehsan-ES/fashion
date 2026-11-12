@@ -12,7 +12,7 @@ export function useGsap(setup, scope, deps = []) {
   useLayoutEffect(() => {
     if (import.meta.env.MODE === "test" || prefersReducedMotion()) return undefined;
     gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => setup(gsap, ScrollTrigger), scope);
+    const ctx = gsap.context(() => setup(gsap, ScrollTrigger), scope?.current ?? scope);
     return () => ctx.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

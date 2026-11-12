@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
-from .models import Brand, Category, Collection, Color, Product, ProductImage, ProductVariant, Size
+from .models import (
+    Brand, Category, Collection, Color, Product, ProductAnswer, ProductImage,
+    ProductQuestion, ProductReview, ProductVariant, Size,
+)
 
 
 def _abs_url(serializer, file_field):
@@ -172,3 +175,78 @@ class ProductDetailSerializer(ProductListSerializer):
 
     def get_collections(self, obj):
         return [{"name": c.name, "slug": c.slug} for c in obj.collections.all() if c.is_active]
+
+
+def _reviewer_name(user):
+    return f"{user.first_name} {user.last_name}".strip() or "مشتری بوتیک"
+
+
+class ProductReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductReview
+        fields = ["id", "author", "rating", "title", "body", "created_at"]
+        read_only_fields = fields
+
+    def get_author(self, obj):
+        return _reviewer_name(obj.user)
+
+
+class ProductReviewCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductReview
+        fields = ["rating", "title", "body"]
+
+    def validate_rating(self, value):
+        if not 1 <= value <= 5:
+            raise serializers.ValidationError("امتیاز باید بین ۱ تا ۵ باشد.")
+        return value
+
+    def validate_body(self, value):
+        value = value.strip()
+        if len(value) < 3:
+            raise serializers.ValidationError("متن نظر باید دست‌کم ۳ نویسه باشد.")
+        return value
+
+    def validate(self, attrs):
+        request = self.context["request"]
+        product = self.context["product"]
+        if ProductReview.objects.filter(product=product, user=request.user).exists():
+            raise serializers.ValidationError("برای این محصول قبلاً نظر ثبت کرده‌اید.")
+        return attrs
+
+
+class ProductAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAnswer
+        fields = ["id", "body", "created_at"]
+        read_only_fields = fields
+
+
+class ProductQuestionSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+    answers = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductQuestion
+        fields = ["id", "author", "body", "created_at", "answers"]
+        read_only_fields = fields
+
+    def get_author(self, obj):
+        return _reviewer_name(obj.user)
+
+    def get_answers(self, obj):
+        return ProductAnswerSerializer(obj.answers.all(), many=True).data
+
+
+class ProductQuestionCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductQuestion
+        fields = ["body"]
+
+    def validate_body(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError("متن پرسش را وارد کنید.")
+        return value

@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react";
-import { expect, test } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, expect, test } from "vitest";
 import { formatPrice } from "../../../shared/utils/format";
+import { useWishlistStore } from "../../wishlist/useWishlistStore";
 import ProductCard from "./ProductCard";
 
 const product = {
@@ -15,12 +16,31 @@ const product = {
   ],
 };
 
+beforeEach(() => {
+  localStorage.removeItem("fashion-boutique-wishlist");
+  useWishlistStore.setState({ items: [], count: 0 });
+});
+
 test("links to the product page and shows name, brand and final price", () => {
   render(<ProductCard product={product} />);
   expect(screen.getByRole("link")).toHaveAttribute("href", "/product/linen-shirt");
   expect(screen.getByRole("heading", { name: "پیراهن کتان" })).toBeInTheDocument();
   expect(screen.getByText("Maison Noor")).toBeInTheDocument();
   expect(screen.getByText(formatPrice("1500000"))).toBeInTheDocument();
+});
+
+test("can save a product from its card and update the wishlist count", () => {
+  render(<ProductCard product={product} />);
+  const button = screen.getByRole("button", { name: `افزودن ${product.name} به علاقه‌مندی‌ها` });
+
+  fireEvent.click(button);
+
+  expect(button).toHaveAttribute("aria-pressed", "true");
+  expect(useWishlistStore.getState().count).toBe(1);
+  expect(JSON.parse(localStorage.getItem("fashion-boutique-wishlist")).state.items).toHaveLength(1);
+
+  fireEvent.click(screen.getByRole("button", { name: `حذف ${product.name} از علاقه‌مندی‌ها` }));
+  expect(useWishlistStore.getState().count).toBe(0);
 });
 
 test("shows discount, new and best-seller badges and the old price", () => {

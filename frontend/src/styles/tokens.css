@@ -5,6 +5,8 @@
   --sand: #d8c9b5;
   --gold: #b69b70;
   --gold-text: #8a7147; /* طلایی تیره‌تر برای متن روی زمینه روشن (Contrast ≥ 4.5) */
+  --oxblood: #6f263d;
+  --oxblood-text: #762941;
 
   --font-fa: "Vazirmatn", system-ui, sans-serif;
   --font-display: "Cormorant Garamond", "Vazirmatn", serif;
